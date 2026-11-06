@@ -121,15 +121,22 @@ export default function App() {
     }
   };
 
-  // Sync on initial mount & load published tenant config
+  // Sync on initial mount & load published tenant config (Live CRM + local fallback)
   useEffect(() => {
-    fetch('/tenant.config.json?t=' + Date.now())
+    const crmApiUrl = `https://crm.agmultiservices.online/api/portal/config?accountId=${tenantConfig.accountId}`;
+    fetch(crmApiUrl)
       .then((res) => {
         if (res.ok) return res.json();
-        return null;
+        throw new Error('CRM config API unavailable');
+      })
+      .catch(() => {
+        return fetch('/tenant.config.json?t=' + Date.now()).then((res) => {
+          if (res.ok) return res.json();
+          return null;
+        });
       })
       .then((data) => {
-        if (data) {
+        if (data && data.brandName) {
           setTenantConfig((prev) => ({ ...prev, ...data }));
           if (data.announcement) {
             setAnnouncement(data.announcement);
@@ -137,7 +144,7 @@ export default function App() {
         }
       })
       .catch((err) => console.log('Using tenant defaults', err));
-  }, []);
+  }, [tenantConfig.accountId]);
 
   // Sync on initial mount & language change
   useEffect(() => {
@@ -305,14 +312,14 @@ export default function App() {
       {/* Main Header / Navigation */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-          {/* Logo & Brand (White-Label Dynamic) */}
+          {/* Logo & Brand (White-Label Dynamic with Official Logo) */}
           <a href="#" className="flex items-center gap-3 group">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-indigo-600 p-0.5 shadow-md shadow-emerald-500/20 group-hover:scale-105 transition-transform duration-300">
-              <div className="w-full h-full bg-white rounded-[14px] flex items-center justify-center">
-                <span className="text-xl font-black bg-gradient-to-tr from-emerald-700 to-teal-700 bg-clip-text text-transparent">
-                  {tenantConfig.brandInitials || 'AG'}
-                </span>
-              </div>
+            <div className="w-12 h-12 rounded-2xl bg-white p-1.5 shadow-md shadow-emerald-500/15 border border-slate-200/80 group-hover:scale-105 transition-transform duration-300 flex items-center justify-center overflow-hidden">
+              <img
+                src="/logo.png"
+                alt={tenantConfig.brandName}
+                className="w-full h-full object-contain"
+              />
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -1278,8 +1285,12 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-600 flex items-center justify-center text-white font-black text-sm">
-                {tenantConfig.brandInitials || 'AG'}
+              <div className="w-10 h-10 rounded-xl bg-white p-1 flex items-center justify-center overflow-hidden shadow-sm">
+                <img
+                  src="/logo.png"
+                  alt={tenantConfig.brandName}
+                  className="w-full h-full object-contain"
+                />
               </div>
               <div>
                 <span className="text-white font-bold text-base block">{tenantConfig.brandName}</span>

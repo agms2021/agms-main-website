@@ -26,16 +26,16 @@ export const DEFAULT_TENANT_CONFIG: TenantConfig = {
   brandInitials: 'AG',
   vleName: 'अधिकृत VLE संचालक: AG Multi Services',
   vleNameEn: 'Authorized VLE Director: AG Multi Services',
-  phone: '9172236821',
-  whatsappNumber: '919172236821',
+  phone: '7498060610',
+  whatsappNumber: '917498060610',
   email: 'agmultis2021@gmail.com',
   address: 'महा-ई-सेवा व नागरी सुविधा केंद्र',
   addressEn: 'Authorized Citizen Service Facility Center',
   crmUrl: 'https://crm.agmultiservices.online',
-  timings: 'सकाळी ८:३० ते रात्री ८:३० (सोमवार ते शनिवार)',
-  timingsEn: '8:30 AM to 8:30 PM (Monday to Saturday)',
-  sunday: 'रविवार: सकाळी ९:०० ते दुपारी २:००',
-  sundayEn: 'Sunday: 9:00 AM to 2:00 PM',
+  timings: 'सकाळी १०:०० ते सायंकाळी ५:३० (सोमवार ते शनिवार)',
+  timingsEn: '10:00 AM to 5:30 PM (Monday to Saturday)',
+  sunday: 'रविवार: बंद',
+  sundayEn: 'Sunday: Closed',
 };
 
 /**
