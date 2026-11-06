@@ -1,0 +1,199 @@
+import { createClient } from '@supabase/supabase-js';
+
+const SUPABASE_URL = 'https://kpvjenicwrzuzrxvucmf.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_4981M7nv9Kqd5DASiR4ikg_xOpbIiBL';
+
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+  },
+});
+
+export interface CitizenUser {
+  id: string;
+  email?: string;
+  phone?: string;
+  fullName: string;
+  role: 'citizen';
+  source: 'website';
+  accountId: string;
+}
+
+export interface CitizenApplication {
+  id: string;
+  service_name: string;
+  status: string;
+  created_at: string;
+  expected_timeline?: string;
+  tracking_id?: string;
+  total_charge?: number;
+}
+
+/**
+ * Register a new citizen from the public website
+ * Attaches source='website' and scopes to the current tenant accountId
+ */
+export async function registerCitizen(params: {
+  fullName: string;
+  email: string;
+  phone: string;
+  password: string;
+  accountId: string;
+}): Promise<{ user: CitizenUser | null; error: string | null }> {
+  try {
+    const { fullName, email, phone, password, accountId } = params;
+
+    // 1. Sign up user via Supabase Auth
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: fullName,
+          phone: phone,
+          role: 'citizen',
+          source: 'website',
+          account_id: accountId,
+        },
+      },
+    });
+
+    if (error) {
+      return { user: null, error: error.message };
+    }
+
+    if (!data.user) {
+      return { user: null, error: 'Registration failed. Please try again.' };
+    }
+
+    // 2. Also register into CRM 'contacts' table if possible with source='website'
+    try {
+      await fetch(`${SUPABASE_URL}/rest/v1/contacts`, {
+        method: 'POST',
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+          Prefer: 'return=minimal',
+        },
+        body: JSON.stringify({
+          account_id: accountId,
+          full_name: fullName,
+          phone: phone,
+          email: email,
+          source: 'website',
+          tags: ['Website Citizen', 'Self Registered'],
+        }),
+      });
+    } catch (e) {
+      console.warn('Could not mirror contact to CRM contacts table', e);
+    }
+
+    const citizen: CitizenUser = {
+      id: data.user.id,
+      email: data.user.email,
+      phone: phone,
+      fullName: fullName,
+      role: 'citizen',
+      source: 'website',
+      accountId: accountId,
+    };
+
+    return { user: citizen, error: null };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error during registration';
+    return { user: null, error: message };
+  }
+}
+
+/**
+ * Login existing citizen with email and password
+ */
+export async function loginCitizen(params: {
+  email: string;
+  password: string;
+}): Promise<{ user: CitizenUser | null; error: string | null }> {
+  try {
+    const { email, password } = params;
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      return { user: null, error: error.message };
+    }
+
+    if (!data.user) {
+      return { user: null, error: 'User not found' };
+    }
+
+    const metadata = data.user.user_metadata || {};
+    const citizen: CitizenUser = {
+      id: data.user.id,
+      email: data.user.email,
+      phone: metadata.phone || '',
+      fullName: metadata.full_name || data.user.email?.split('@')[0] || 'नागरिक',
+      role: 'citizen',
+      source: metadata.source || 'website',
+      accountId: metadata.account_id || '',
+    };
+
+    return { user: citizen, error: null };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Login failed';
+    return { user: null, error: message };
+  }
+}
+
+/**
+ * Reset password via email
+ */
+export async function resetCitizenPassword(email: string): Promise<{ success: boolean; error: string | null }> {
+  try {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin,
+    });
+    if (error) return { success: false, error: error.message };
+    return { success: true, error: null };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Password reset failed';
+    return { success: false, error: message };
+  }
+}
+
+/**
+ * Sign out current citizen
+ */
+export async function logoutCitizen(): Promise<void> {
+  await supabase.auth.signOut();
+}
+
+/**
+ * Fetch citizen applications from CRM by phone or email
+ */
+export async function fetchCitizenApplications(phoneOrEmail: string): Promise<CitizenApplication[]> {
+  try {
+    if (!phoneOrEmail) return [];
+    const cleanQuery = phoneOrEmail.replace(/\D/g, '');
+
+    // Search applications table
+    const url = `${SUPABASE_URL}/rest/v1/applications?or=(customer_phone.ilike.%${cleanQuery}%,customer_email.ilike.%${phoneOrEmail}%)&order=created_at.desc&limit=10`;
+    const res = await fetch(url, {
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      },
+    });
+
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data || [];
+  } catch {
+    return [];
+  }
+}
+

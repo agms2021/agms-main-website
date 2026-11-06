@@ -1,0 +1,27 @@
+{
+  "accountId": "47b99dd3-d6c5-4594-a159-1ca55e7848b0",
+  "brandName": "AG Multi Services",
+  "brandTagline": "शासकीय व नागरी सेवा केंद्र",
+  "brandTaglineEn": "Citizen & Government Services Center",
+  "brandInitials": "AG",
+  "vleName": "अधिकृत VLE संचालक: AG Multi Services",
+  "vleNameEn": "Authorized VLE Director: AG Multi Services",
+  "phone": "7498060610",
+  "whatsappNumber": "917498060610",
+  "email": "agmultis2021@gmail.com",
+  "address": "महा-ई-सेवा व नागरी सुविधा केंद्र",
+  "addressEn": "Authorized Citizen Service Facility Center",
+  "crmUrl": "https://crm.agmultiservices.online",
+  "websiteUrl": "https://agmultiservices.online",
+  "timings": "सकाळी १० ते रात्री ५ :३० (सोमवार ते शनिवार)",
+  "timingsEn": "8:30 AM to 8:30 PM (Monday to Saturday)",
+  "sunday": "रविवार: सकाळी ९:०० ते दुपारी २:००",
+  "sundayEn": "Sunday: 9:00 AM to 2:00 PM",
+  "announcement": {
+    "enabled": true,
+    "text": "लाडकी बहीण योजना ई-केवायसी आणि नवीन अर्ज केंद्रामध्ये सुरू आहेत.",
+    "textEn": "Majhi Ladki Bahin Yojana e-KYC and new applications are active at our center.",
+    "linkText": "तपासा"
+  },
+  "updatedAt": "2026-11-05T14:57:28.520Z"
+}
