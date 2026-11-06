@@ -314,11 +314,11 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           {/* Logo & Brand (White-Label Dynamic with Official Logo) */}
           <a href="#" className="flex items-center gap-3 group">
-            <div className="w-12 h-12 rounded-2xl bg-white p-1.5 shadow-md shadow-emerald-500/15 border border-slate-200/80 group-hover:scale-105 transition-transform duration-300 flex items-center justify-center overflow-hidden">
+            <div className="w-12 h-12 rounded-2xl bg-white p-1 shadow-md shadow-emerald-500/15 border border-slate-200/80 group-hover:scale-105 transition-transform duration-300 flex items-center justify-center overflow-hidden">
               <img
-                src="/logo.png"
+                src="/logo.png?v=2"
                 alt={tenantConfig.brandName}
-                className="w-full h-full object-contain"
+                className="w-full h-full object-contain rounded-xl"
               />
             </div>
             <div>
@@ -1287,9 +1287,9 @@ export default function App() {
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-white p-1 flex items-center justify-center overflow-hidden shadow-sm">
                 <img
-                  src="/logo.png"
+                  src="/logo.png?v=2"
                   alt={tenantConfig.brandName}
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-contain rounded-lg"
                 />
               </div>
               <div>
