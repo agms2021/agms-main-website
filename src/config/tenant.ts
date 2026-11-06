@@ -1,6 +1,8 @@
 export interface TenantConfig {
   accountId: string;
   brandName: string;
+  centerBadge?: string;
+  centerBadgeEn?: string;
   brandTagline: string;
   brandTaglineEn?: string;
   brandInitials: string;
@@ -21,16 +23,18 @@ export interface TenantConfig {
 export const DEFAULT_TENANT_CONFIG: TenantConfig = {
   accountId: '47b99dd3-d6c5-4594-a159-1ca55e7848b0',
   brandName: 'AG Multi Services',
-  brandTagline: 'शासकीय व नागरी सेवा केंद्र',
-  brandTaglineEn: 'Citizen & Government Services Center',
+  centerBadge: 'आपले सरकार सेवा केंद्र',
+  centerBadgeEn: 'Aaple Sarkar Seva Kendra',
+  brandTagline: 'तुमचा विश्वासू डिजिटल पार्टनर',
+  brandTaglineEn: 'Your Trusted Digital Partner',
   brandInitials: 'AG',
-  vleName: 'अधिकृत VLE संचालक: AG Multi Services',
-  vleNameEn: 'Authorized VLE Director: AG Multi Services',
+  vleName: 'अधिकृत आपले सरकार सेवा केंद्र: AG Multi Services',
+  vleNameEn: 'Authorized Aaple Sarkar Seva Kendra: AG Multi Services',
   phone: '7498060610',
   whatsappNumber: '917498060610',
   email: 'agmultis2021@gmail.com',
-  address: 'महा-ई-सेवा व नागरी सुविधा केंद्र',
-  addressEn: 'Authorized Citizen Service Facility Center',
+  address: 'आपले सरकार सेवा केंद्र व नागरी सुविधा केंद्र',
+  addressEn: 'Aaple Sarkar Seva Kendra & Citizen Service Center',
   crmUrl: 'https://crm.agmultiservices.online',
   timings: 'सकाळी १०:०० ते सायंकाळी ५:३० (सोमवार ते शनिवार)',
   timingsEn: '10:00 AM to 5:30 PM (Monday to Saturday)',

@@ -264,57 +264,55 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-emerald-500/20 selection:text-emerald-800 relative">
-      {/* 📢 DYNAMIC ANNOUNCEMENT TICKER (User Editable) */}
-      {announcement.enabled && announcement.text && (
-        <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-slate-950 text-xs sm:text-sm py-2 px-4 shadow-sm border-b border-amber-600/30">
-          <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-            <div className="flex items-center gap-2 overflow-hidden">
-              <span className="shrink-0 px-2 py-0.5 rounded-full bg-slate-950 text-amber-300 font-extrabold text-[10px] uppercase tracking-wide">
-                {lang === 'mr' ? 'महत्त्वाची सूचना' : 'Notice'}
-              </span>
-              <p className="font-bold truncate text-slate-950">
-                {announcement.text}
-              </p>
-            </div>
+      {/* 📢 UNIFIED SLEEK TOP BAR (Single Clean Header Top) */}
+      <div className="bg-gradient-to-r from-emerald-950 via-teal-950 to-slate-950 text-white text-xs py-2 px-4 border-b border-emerald-800/40">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+          {/* Left: Important Notice */}
+          <div className="flex items-center gap-2 overflow-hidden">
+            <span className="shrink-0 px-2.5 py-0.5 rounded-full bg-amber-500 text-slate-950 font-black text-[10px] uppercase tracking-wide">
+              {lang === 'mr' ? 'महत्त्वाची सूचना' : 'Notice'}
+            </span>
+            <p className="font-semibold truncate text-emerald-100 text-xs sm:text-sm">
+              {announcement.text || (lang === 'mr' ? 'लाडकी बहीण योजना ई-केवायसी आणि नवीन अर्ज केंद्रामध्ये सुरू आहेत.' : 'Majhi Ladki Bahin Yojana e-KYC & applications are active.')}
+            </p>
             <a
               href="#services"
-              className="shrink-0 text-xs font-black underline hover:text-white transition"
+              className="shrink-0 text-amber-300 font-bold underline hover:text-white transition text-xs hidden sm:inline"
             >
-              {announcement.linkText || (lang === 'mr' ? 'पहा' : 'View')}
+              {announcement.linkText || (lang === 'mr' ? 'तपासा' : 'Check')}
+            </a>
+          </div>
+
+          {/* Right: Quick Timings & Direct WhatsApp Contact */}
+          <div className="flex items-center gap-4 text-xs font-semibold shrink-0">
+            <div className="hidden md:flex items-center gap-1.5 text-emerald-200">
+              <Clock className="w-3.5 h-3.5 text-emerald-400" />
+              <span>
+                {lang === 'mr'
+                  ? (tenantConfig.timings || 'वेळ: स. १०:०० ते सायं. ५:३० (सोम-शनि)')
+                  : (tenantConfig.timingsEn || 'Hours: 10:00 AM - 5:30 PM (Mon-Sat)')}
+              </span>
+            </div>
+            <a
+              href={`https://wa.me/${waTargetNumber}?text=${encodeURIComponent(contactInfo.whatsappMsg)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition shadow-xs border border-emerald-400/40"
+              title="थेट WhatsApp संपर्क"
+            >
+              <MessageSquare className="w-3.5 h-3.5 text-emerald-100" />
+              <span>WhatsApp: {tenantConfig.phone}</span>
             </a>
           </div>
         </div>
-      )}
-
-      {/* Top Banner Notice with Bhashini & CRM Live Status */}
-      <div className="bg-gradient-to-r from-emerald-900 via-teal-900 to-slate-950 text-white text-xs sm:text-sm py-2 px-4 text-center font-medium flex flex-wrap items-center justify-center gap-2">
-        <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span>
-          {lang === 'mr'
-            ? 'अधिकृत नागरी सुविधा केंद्र | सर्व शासकीय अर्ज, दाखले व योजना एकाच ठिकाणी'
-            : 'Official Citizen Service Center | All Government Applications, Certificates & Schemes'}
-        </span>
-        <span className="hidden sm:inline-block px-2 py-0.5 rounded-full bg-orange-500/30 text-orange-200 border border-orange-400/40 text-[11px] font-bold">
-          🇮🇳 {t.hero.bhashiniBadge}
-        </span>
-        <span className="hidden md:inline text-emerald-300">|</span>
-        <a
-          href={tenantConfig.crmUrl || 'https://crm.agmultiservices.online'}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hidden md:inline-flex items-center gap-1 text-emerald-300 hover:text-white underline font-semibold transition"
-        >
-          <span>{tenantConfig.crmUrl.replace(/^https?:\/\//, '')}</span>
-          <ExternalLink className="w-3.5 h-3.5" />
-        </a>
       </div>
 
       {/* Main Header / Navigation */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-          {/* Logo & Brand (White-Label Dynamic with Official Logo) */}
-          <a href="#" className="flex items-center gap-3 group">
-            <div className="w-12 h-12 rounded-2xl bg-white p-1 shadow-md shadow-emerald-500/15 border border-slate-200/80 group-hover:scale-105 transition-transform duration-300 flex items-center justify-center overflow-hidden">
+          {/* Logo & Brand (Aaple Sarkar Seva Kendra + Official 3D AG Logo) */}
+          <a href="#" className="flex items-center gap-3.5 group">
+            <div className="w-13 h-13 rounded-2xl bg-white p-1 shadow-md shadow-emerald-500/15 border border-slate-200/90 group-hover:scale-105 transition-transform duration-300 flex items-center justify-center overflow-hidden shrink-0">
               <img
                 src="/logo.png?v=2"
                 alt={tenantConfig.brandName}
@@ -322,15 +320,16 @@ export default function App() {
               />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 group-hover:text-emerald-700 transition">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 group-hover:text-emerald-700 transition">
                   {tenantConfig.brandName || t.nav.brand}
                 </span>
-                <span className="hidden sm:inline-block px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-md bg-emerald-100 text-emerald-800 border border-emerald-200">
-                  CSC
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-[11px] font-extrabold rounded-md bg-gradient-to-r from-orange-100 via-amber-100 to-orange-100 text-orange-950 border border-orange-300/80 shadow-2xs">
+                  <Landmark className="w-3 h-3 text-orange-600 shrink-0" />
+                  <span>{tenantConfig.centerBadge || (lang === 'mr' ? 'आपले सरकार सेवा केंद्र' : 'Aaple Sarkar Seva Kendra')}</span>
                 </span>
               </div>
-              <p className="text-xs text-slate-500 font-medium">
+              <p className="text-xs text-emerald-700 font-extrabold tracking-wide mt-0.5">
                 {lang === 'mr'
                   ? (tenantConfig.brandTagline || t.nav.tagline)
                   : (tenantConfig.brandTaglineEn || tenantConfig.brandTagline || t.nav.tagline)}
@@ -353,18 +352,10 @@ export default function App() {
               {t.nav.services}
             </a>
             <a
-              href="#crm"
-              className="text-sm font-semibold text-emerald-800 hover:text-emerald-950 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200/80 hover:bg-emerald-100 transition"
-            >
-              <Laptop className="w-4 h-4 text-emerald-600" />
-              <span>{t.nav.crmTab}</span>
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            </a>
-            <a
               href="#how-it-works"
               className="text-sm font-semibold text-slate-700 hover:text-emerald-700 transition"
             >
-              {t.howItWorks.title}
+              {lang === 'mr' ? 'कार्यपद्धती' : t.howItWorks.title}
             </a>
             <a
               href="#faq"
@@ -492,18 +483,11 @@ export default function App() {
               {t.nav.services}
             </a>
             <a
-              href="#crm"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block px-3 py-2 rounded-lg text-base font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100"
-            >
-              {t.nav.crmTab}
-            </a>
-            <a
               href="#how-it-works"
               onClick={() => setMobileMenuOpen(false)}
               className="block px-3 py-2 rounded-lg text-base font-semibold text-slate-800 hover:bg-slate-100"
             >
-              {t.howItWorks.title}
+              {lang === 'mr' ? 'कार्यपद्धती' : t.howItWorks.title}
             </a>
             <a
               href="#faq"
@@ -1294,6 +1278,7 @@ export default function App() {
               </div>
               <div>
                 <span className="text-white font-bold text-base block">{tenantConfig.brandName}</span>
+                <span className="text-amber-400 text-xs font-semibold block">{tenantConfig.centerBadge || (lang === 'mr' ? 'आपले सरकार सेवा केंद्र' : 'Aaple Sarkar Seva Kendra')}</span>
                 <span className="text-slate-400 text-xs">
                   {lang === 'mr'
                     ? (tenantConfig.brandTagline || t.nav.tagline)
