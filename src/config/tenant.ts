@@ -13,6 +13,12 @@ export interface TenantConfig {
   email: string;
   address: string;
   addressEn?: string;
+  defaultDistrict?: string;
+  defaultDistrictMr?: string;
+  defaultTaluka?: string;
+  defaultTalukaMr?: string;
+  defaultVillage?: string;
+  defaultVillageMr?: string;
   crmUrl: string;
   timings: string;
   timingsEn?: string;
@@ -35,6 +41,12 @@ export const DEFAULT_TENANT_CONFIG: TenantConfig = {
   email: 'agmultis2021@gmail.com',
   address: 'आपले सरकार सेवा केंद्र व नागरी सुविधा केंद्र',
   addressEn: 'Aaple Sarkar Seva Kendra & Citizen Service Center',
+  defaultDistrict: 'Nashik',
+  defaultDistrictMr: 'नाशिक',
+  defaultTaluka: 'Sinnar',
+  defaultTalukaMr: 'सिन्नर',
+  defaultVillage: 'Ghorwad',
+  defaultVillageMr: 'घोरवड',
   crmUrl: 'https://crm.agmultiservices.online',
   timings: 'सकाळी १०:०० ते सायंकाळी ५:३० (सोमवार ते शनिवार)',
   timingsEn: '10:00 AM to 5:30 PM (Monday to Saturday)',

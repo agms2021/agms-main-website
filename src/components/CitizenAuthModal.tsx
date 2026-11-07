@@ -13,6 +13,8 @@ import {
   AlertCircle,
   Loader2,
   Sparkles,
+  MapPin,
+  Home,
 } from 'lucide-react';
 import type { Language } from '../data/translations';
 import {
@@ -21,6 +23,49 @@ import {
   resetCitizenPassword,
   type CitizenUser,
 } from '../services/supabase';
+
+const MAHARASHTRA_DISTRICTS = [
+  { en: 'Nashik', mr: 'नाशिक' },
+  { en: 'Ahilyanagar', mr: 'अहिल्यानगर' },
+  { en: 'Chhatrapati Sambhajinagar', mr: 'छत्रपती संभाजीनगर' },
+  { en: 'Dhule', mr: 'धुळे' },
+  { en: 'Jalgaon', mr: 'जळगाव' },
+  { en: 'Jalna', mr: 'जालना' },
+  { en: 'Kolhapur', mr: 'कोल्हापूर' },
+  { en: 'Mumbai City', mr: 'मुंबई शहर' },
+  { en: 'Mumbai Suburban', mr: 'मुंबई उपनगर' },
+  { en: 'Nagpur', mr: 'नागपूर' },
+  { en: 'Nanded', mr: 'नांदेड' },
+  { en: 'Nandurbar', mr: 'नंदूरबार' },
+  { en: 'Palghar', mr: 'पालघर' },
+  { en: 'Pune', mr: 'पुणे' },
+  { en: 'Raigad', mr: 'रायगड' },
+  { en: 'Ratnagiri', mr: 'रत्नागिरी' },
+  { en: 'Sangli', mr: 'सांगली' },
+  { en: 'Satara', mr: 'सातारा' },
+  { en: 'Solapur', mr: 'सोलापूर' },
+  { en: 'Thane', mr: 'ठाणे' },
+  { en: 'Other', mr: 'इतर जिल्हा' },
+];
+
+const NASHIK_TALUKAS = [
+  { en: 'Sinnar', mr: 'सिन्नर' },
+  { en: 'Nashik', mr: 'नाशिक' },
+  { en: 'Niphad', mr: 'निफाड' },
+  { en: 'Igatpuri', mr: 'इगतपूरी' },
+  { en: 'Dindori', mr: 'दिंडोरी' },
+  { en: 'Chandvad', mr: 'चांदवड' },
+  { en: 'Yevla', mr: 'येवला' },
+  { en: 'Trimbakeshwar', mr: 'त्र्यंबक' },
+  { en: 'Malegaon', mr: 'मालेगाव' },
+  { en: 'Deola', mr: 'देवळा' },
+  { en: 'Nandgaon', mr: 'नांदगाव' },
+  { en: 'Kalwan', mr: 'कालवण' },
+  { en: 'Baglan', mr: 'बागलण' },
+  { en: 'Peth', mr: 'पेठ' },
+  { en: 'Surgana', mr: 'सुरगना' },
+  { en: 'Other', mr: 'इतर तालुका' },
+];
 
 interface CitizenAuthModalProps {
   isOpen: boolean;
@@ -47,6 +92,11 @@ export const CitizenAuthModal: React.FC<CitizenAuthModalProps> = ({
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [altPhone, setAltPhone] = useState('');
+  const [district, setDistrict] = useState(lang === 'mr' ? 'नाशिक' : 'Nashik');
+  const [taluka, setTaluka] = useState(lang === 'mr' ? 'सिन्नर' : 'Sinnar');
+  const [village, setVillage] = useState('');
+  const [address, setAddress] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -63,6 +113,11 @@ export const CitizenAuthModal: React.FC<CitizenAuthModalProps> = ({
     setSuccessMsg(null);
     setPassword('');
     setConfirmPassword('');
+    setVillage('');
+    setAddress('');
+    setAltPhone('');
+    setDistrict(lang === 'mr' ? 'नाशिक' : 'Nashik');
+    setTaluka(lang === 'mr' ? 'सिन्नर' : 'Sinnar');
   };
 
   const handleTabChange = (newTab: AuthTab) => {
@@ -158,11 +213,17 @@ export const CitizenAuthModal: React.FC<CitizenAuthModalProps> = ({
     }
 
     setLoading(true);
+    const cleanAltPhone = altPhone.replace(/\D/g, '');
     const { user, error } = await registerCitizen({
       fullName,
       email,
       phone: cleanPhone,
       password,
+      district,
+      taluka,
+      village: village.trim() || undefined,
+      address: address.trim() || undefined,
+      alternatePhone: cleanAltPhone || undefined,
       accountId: accountId || '47b99dd3-d6c5-4594-a159-1ca55e7848b0',
     });
     setLoading(false);
@@ -223,10 +284,10 @@ export const CitizenAuthModal: React.FC<CitizenAuthModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75 backdrop-blur-xs animate-in fade-in duration-200">
+      <div className="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden max-h-[92vh] flex flex-col">
         {/* Top Header Banner with Brand */}
-        <div className="relative bg-gradient-to-r from-emerald-800 via-teal-800 to-slate-900 px-6 py-5 text-white">
+        <div className="relative bg-gradient-to-r from-emerald-800 via-teal-800 to-slate-900 px-5 sm:px-6 py-4 sm:py-5 text-white shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <div className="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center">
@@ -249,7 +310,7 @@ export const CitizenAuthModal: React.FC<CitizenAuthModalProps> = ({
             </button>
           </div>
 
-          <div className="mt-3 flex items-center gap-2 text-xs text-emerald-200/80">
+          <div className="mt-2.5 flex items-center gap-2 text-xs text-emerald-200/90">
             <Sparkles className="w-3.5 h-3.5 text-amber-300" />
             <span>
               {lang === 'mr'
@@ -261,11 +322,11 @@ export const CitizenAuthModal: React.FC<CitizenAuthModalProps> = ({
 
         {/* Tab Buttons (Login vs Register) */}
         {tab !== 'forgot' && (
-          <div className="flex border-b border-slate-200 bg-slate-50/80 p-1">
+          <div className="flex border-b border-slate-200 bg-slate-50/80 p-1 shrink-0">
             <button
               type="button"
               onClick={() => handleTabChange('login')}
-              className={`flex-1 py-2.5 text-xs sm:text-sm font-bold rounded-xl transition cursor-pointer ${
+              className={`flex-1 py-2 text-xs sm:text-sm font-bold rounded-xl transition cursor-pointer ${
                 tab === 'login'
                   ? 'bg-white text-emerald-800 shadow-xs border border-slate-200/80'
                   : 'text-slate-600 hover:text-slate-900'
@@ -276,7 +337,7 @@ export const CitizenAuthModal: React.FC<CitizenAuthModalProps> = ({
             <button
               type="button"
               onClick={() => handleTabChange('register')}
-              className={`flex-1 py-2.5 text-xs sm:text-sm font-bold rounded-xl transition cursor-pointer ${
+              className={`flex-1 py-2 text-xs sm:text-sm font-bold rounded-xl transition cursor-pointer ${
                 tab === 'register'
                   ? 'bg-white text-emerald-800 shadow-xs border border-slate-200/80'
                   : 'text-slate-600 hover:text-slate-900'
@@ -287,8 +348,8 @@ export const CitizenAuthModal: React.FC<CitizenAuthModalProps> = ({
           </div>
         )}
 
-        {/* Form Body */}
-        <div className="p-6">
+        {/* Form Body - Scrollable */}
+        <div className="p-5 sm:p-6 overflow-y-auto">
           {/* Error Alert */}
           {errorMsg && (
             <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-800 text-xs font-semibold flex items-start gap-2 animate-in slide-in-from-top-1">
@@ -380,10 +441,11 @@ export const CitizenAuthModal: React.FC<CitizenAuthModalProps> = ({
 
           {/* 2. REGISTER FORM */}
           {tab === 'register' && (
-            <form onSubmit={handleRegister} className="space-y-3.5">
+            <form onSubmit={handleRegister} className="space-y-3">
+              {/* Full Name */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  {lang === 'mr' ? 'पूर्ण नाव' : 'Full Name'}
+                  {lang === 'mr' ? 'पूर्ण नाव *' : 'Full Name *'}
                 </label>
                 <div className="relative">
                   <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -393,32 +455,137 @@ export const CitizenAuthModal: React.FC<CitizenAuthModalProps> = ({
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder={lang === 'mr' ? 'उदा. राहुल रमेश पाटील' : 'e.g. Rahul Ramesh Patil'}
-                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-600 transition"
+                    className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-600 transition"
                   />
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  {lang === 'mr' ? 'मोबाईल नंबर (WhatsApp)' : 'Mobile Number (WhatsApp)'}
-                </label>
-                <div className="relative">
-                  <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="tel"
-                    required
-                    maxLength={10}
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-                    placeholder="98XXXXXXXX"
-                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-600 transition"
-                  />
+              {/* Mobile Numbers (Primary & Alternate) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    {lang === 'mr' ? 'मोबाईल नंबर (WhatsApp) *' : 'Mobile (WhatsApp) *'}
+                  </label>
+                  <div className="relative">
+                    <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="tel"
+                      required
+                      maxLength={10}
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
+                      placeholder="98XXXXXXXX"
+                      className="w-full pl-10 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-600 transition"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    {lang === 'mr' ? 'पर्यायी मोबाईल (ऐच्छिक)' : 'Alternate Mobile (Optional)'}
+                  </label>
+                  <div className="relative">
+                    <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="tel"
+                      maxLength={10}
+                      value={altPhone}
+                      onChange={(e) => setAltPhone(e.target.value.replace(/\D/g, ''))}
+                      placeholder={lang === 'mr' ? 'पर्यायी क्रमांक' : 'Alt phone'}
+                      className="w-full pl-10 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-600 transition"
+                    />
+                  </div>
                 </div>
               </div>
 
+              {/* District & Taluka with Defaults Pre-selected */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center justify-between">
+                    <span>{lang === 'mr' ? 'जिल्हा *' : 'District *'}</span>
+                    <span className="text-[10px] text-emerald-700 font-extrabold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                      Default
+                    </span>
+                  </label>
+                  <div className="relative">
+                    <MapPin className="w-4 h-4 text-emerald-600 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <select
+                      value={district}
+                      onChange={(e) => setDistrict(e.target.value)}
+                      className="w-full pl-9 pr-2 py-2 bg-slate-50 border border-emerald-300 rounded-xl text-xs sm:text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-600 transition"
+                    >
+                      {MAHARASHTRA_DISTRICTS.map((d) => (
+                        <option key={d.en} value={lang === 'mr' ? d.mr : d.en}>
+                          {lang === 'mr' ? d.mr : d.en}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center justify-between">
+                    <span>{lang === 'mr' ? 'तालुका *' : 'Taluka *'}</span>
+                    <span className="text-[10px] text-emerald-700 font-extrabold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                      Default
+                    </span>
+                  </label>
+                  <div className="relative">
+                    <MapPin className="w-4 h-4 text-emerald-600 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <select
+                      value={taluka}
+                      onChange={(e) => setTaluka(e.target.value)}
+                      className="w-full pl-9 pr-2 py-2 bg-slate-50 border border-emerald-300 rounded-xl text-xs sm:text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-600 transition"
+                    >
+                      {NASHIK_TALUKAS.map((t) => (
+                        <option key={t.en} value={lang === 'mr' ? t.mr : t.en}>
+                          {lang === 'mr' ? t.mr : t.en}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Village / City & Address */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    {lang === 'mr' ? 'गाव / शहर' : 'Village / City'}
+                  </label>
+                  <div className="relative">
+                    <Home className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      value={village}
+                      onChange={(e) => setVillage(e.target.value)}
+                      placeholder={lang === 'mr' ? 'उदा. घोरवड / सिन्नर' : 'e.g. Ghorwad / Sinnar'}
+                      className="w-full pl-10 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-600 transition"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    {lang === 'mr' ? 'पत्ता / परिसर' : 'Address / Area'}
+                  </label>
+                  <div className="relative">
+                    <MapPin className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      placeholder={lang === 'mr' ? 'घर क्र., वाडी, गल्ली' : 'House no, area'}
+                      className="w-full pl-10 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-600 transition"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Email Address */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  {lang === 'mr' ? 'ईमेल पत्ता' : 'Email Address'}
+                  {lang === 'mr' ? 'ईमेल पत्ता *' : 'Email Address *'}
                 </label>
                 <div className="relative">
                   <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -428,15 +595,16 @@ export const CitizenAuthModal: React.FC<CitizenAuthModalProps> = ({
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="example@gmail.com"
-                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-600 transition"
+                    className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-600 transition"
                   />
                 </div>
               </div>
 
+              {/* Passwords */}
               <div className="grid grid-cols-2 gap-2.5">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
-                    {lang === 'mr' ? 'पासवर्ड' : 'Password'}
+                    {lang === 'mr' ? 'पासवर्ड *' : 'Password *'}
                   </label>
                   <div className="relative">
                     <input
@@ -452,7 +620,7 @@ export const CitizenAuthModal: React.FC<CitizenAuthModalProps> = ({
 
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
-                    {lang === 'mr' ? 'पुन्हा पासवर्ड' : 'Confirm'}
+                    {lang === 'mr' ? 'पुन्हा पासवर्ड *' : 'Confirm *'}
                   </label>
                   <div className="relative">
                     <input
@@ -467,8 +635,13 @@ export const CitizenAuthModal: React.FC<CitizenAuthModalProps> = ({
                 </div>
               </div>
 
-              <p className="text-[11px] text-slate-500">
-                🔒 {lang === 'mr' ? 'आपली नोंदणी थेट आमच्या अधिकृत CRM डेटाबेसशी जोडली जाईल.' : 'Your registration connects securely to our official CRM database.'}
+              <p className="text-[11px] text-slate-500 flex items-center gap-1.5 pt-1">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <span>
+                  {lang === 'mr'
+                    ? 'आपली माहिती अधिकृत CRM संपर्क यादीत सुरक्षितपणे जतन केली जाईल.'
+                    : 'Your information is securely saved into our official CRM contacts.'}
+                </span>
               </p>
 
               <button
@@ -483,7 +656,7 @@ export const CitizenAuthModal: React.FC<CitizenAuthModalProps> = ({
                   </>
                 ) : (
                   <>
-                    <span>{lang === 'mr' ? 'खाते तयार करा (Register)' : 'Create Account'}</span>
+                    <span>{lang === 'mr' ? 'खाते तयार करा (नोंदणी पूर्ण करा)' : 'Create Account (Register)'}</span>
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}

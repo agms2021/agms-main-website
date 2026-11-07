@@ -41,9 +41,25 @@ export async function registerCitizen(params: {
   phone: string;
   password: string;
   accountId: string;
+  district?: string;
+  taluka?: string;
+  village?: string;
+  address?: string;
+  alternatePhone?: string;
 }): Promise<{ user: CitizenUser | null; error: string | null }> {
   try {
-    const { fullName, email, phone, password, accountId } = params;
+    const {
+      fullName,
+      email,
+      phone,
+      password,
+      accountId,
+      district,
+      taluka,
+      village,
+      address,
+      alternatePhone
+    } = params;
 
     // 1. Sign up user via Supabase Auth
     const { data, error } = await supabase.auth.signUp({
@@ -56,6 +72,11 @@ export async function registerCitizen(params: {
           role: 'citizen',
           source: 'website',
           account_id: accountId,
+          district: district || 'Nashik',
+          taluka: taluka || 'Sinnar',
+          village: village || '',
+          address: address || '',
+          alternate_phone: alternatePhone || '',
         },
       },
     });
@@ -80,6 +101,11 @@ export async function registerCitizen(params: {
           fullName,
           phone,
           email,
+          district: district || 'Nashik',
+          taluka: taluka || 'Sinnar',
+          village: village || null,
+          address: address || null,
+          alternatePhone: alternatePhone || null,
           source: 'website',
         }),
       });
