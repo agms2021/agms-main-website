@@ -137,7 +137,17 @@ export default function App() {
       })
       .then((data) => {
         if (data && data.brandName) {
-          setTenantConfig((prev) => ({ ...prev, ...data }));
+          const officialTagline = 'तुमचा विश्वासू डिजिटल पार्टनर';
+          const officialTaglineEn = 'Your Trusted Digital Partner';
+          const officialBadge = 'आपले सरकार सेवा केंद्र';
+
+          setTenantConfig((prev) => ({
+            ...prev,
+            ...data,
+            brandTagline: data.brandTagline === 'शासकीय व नागरी सेवा केंद्र' ? officialTagline : (data.brandTagline || officialTagline),
+            brandTaglineEn: data.brandTaglineEn === 'Citizen & Government Services Center' ? officialTaglineEn : (data.brandTaglineEn || officialTaglineEn),
+            centerBadge: data.centerBadge || officialBadge,
+          }));
           if (data.announcement) {
             setAnnouncement(data.announcement);
           }

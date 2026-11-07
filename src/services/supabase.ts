@@ -68,23 +68,19 @@ export async function registerCitizen(params: {
       return { user: null, error: 'Registration failed. Please try again.' };
     }
 
-    // 2. Also register into CRM 'contacts' table if possible with source='website'
+    // 2. Mirror into CRM 'contacts' table via secure CRM Portal API
     try {
-      await fetch(`${SUPABASE_URL}/rest/v1/contacts`, {
+      await fetch('https://crm.agmultiservices.online/api/portal/citizen', {
         method: 'POST',
         headers: {
-          apikey: SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
           'Content-Type': 'application/json',
-          Prefer: 'return=minimal',
         },
         body: JSON.stringify({
-          account_id: accountId,
-          full_name: fullName,
-          phone: phone,
-          email: email,
+          accountId,
+          fullName,
+          phone,
+          email,
           source: 'website',
-          tags: ['Website Citizen', 'Self Registered'],
         }),
       });
     } catch (e) {
@@ -180,18 +176,15 @@ export async function fetchCitizenApplications(phoneOrEmail: string): Promise<Ci
     if (!phoneOrEmail) return [];
     const cleanQuery = phoneOrEmail.replace(/\D/g, '');
 
-    // Search applications table
-    const url = `${SUPABASE_URL}/rest/v1/applications?or=(customer_phone.ilike.%${cleanQuery}%,customer_email.ilike.%${phoneOrEmail}%)&order=created_at.desc&limit=10`;
-    const res = await fetch(url, {
-      headers: {
-        apikey: SUPABASE_ANON_KEY,
-        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-      },
-    });
-
-    if (!res.ok) return [];
-    const data = await res.json();
-    return data || [];
+    const url = `https://crm.agmultiservices.online/api/portal/citizen?phone=${cleanQuery}&email=${encodeURIComponent(phoneOrEmail)}`;
+    const res = await fetch(url);
+    if (res.ok) {
+      const data = await res.json();
+      if (data && Array.isArray(data.applications)) {
+        return data.applications;
+      }
+    }
+    return [];
   } catch {
     return [];
   }
