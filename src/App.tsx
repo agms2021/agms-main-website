@@ -329,80 +329,88 @@ export default function App() {
       </div>
 
       {/* Main Header / Navigation */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[76px] sm:h-20 py-2 sm:py-0 flex items-center justify-between gap-4">
           {/* Logo & Brand (Aaple Sarkar Seva Kendra + Official 3D AG Logo) */}
-          <a href="#" className="flex items-center gap-3.5 group">
-            <div className="w-13 h-13 rounded-2xl bg-white p-1 shadow-md shadow-emerald-500/15 border border-slate-200/90 group-hover:scale-105 transition-transform duration-300 flex items-center justify-center overflow-hidden shrink-0">
+          <a href="#" className="flex items-center gap-3 sm:gap-3.5 group shrink-0">
+            <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-emerald-50 via-white to-amber-50 p-1.5 shadow-md shadow-emerald-950/10 border border-slate-200 group-hover:border-emerald-400 group-hover:shadow-lg group-hover:shadow-emerald-500/15 group-hover:scale-105 transition-all duration-300 flex items-center justify-center shrink-0">
               <img
                 src="/logo.png?v=2"
                 alt={tenantConfig.brandName}
                 className="w-full h-full object-contain rounded-xl"
               />
+              <span className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-600 text-white rounded-full flex items-center justify-center text-[9px] font-black border-2 border-white shadow-xs" title="अधिकृत केंद्र">
+                ✓
+              </span>
             </div>
-            <div>
-              <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-col">
+              {/* Row 1: Brand Title + Official Center Badge */}
+              <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 group-hover:text-emerald-700 transition">
                   {tenantConfig.brandName || t.nav.brand}
                 </span>
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-[11px] font-extrabold rounded-md bg-gradient-to-r from-orange-100 via-amber-100 to-orange-100 text-orange-950 border border-orange-300/80 shadow-2xs">
-                  <Landmark className="w-3 h-3 text-orange-600 shrink-0" />
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-[11px] font-black rounded-full bg-gradient-to-r from-amber-500/15 via-orange-500/20 to-amber-500/15 text-amber-950 border border-amber-400/80 shadow-2xs">
+                  <Landmark className="w-3 h-3 text-amber-700 shrink-0" />
                   <span>{tenantConfig.centerBadge || (lang === 'mr' ? 'आपले सरकार सेवा केंद्र' : 'Aaple Sarkar Seva Kendra')}</span>
                 </span>
               </div>
-              <p className="text-xs text-emerald-700 font-extrabold tracking-wide mt-0.5">
-                {lang === 'mr'
-                  ? (tenantConfig.brandTagline || t.nav.tagline)
-                  : (tenantConfig.brandTaglineEn || tenantConfig.brandTagline || t.nav.tagline)}
-              </p>
+              {/* Row 2: Tagline with Verified Shield */}
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <p className="text-xs text-emerald-800 font-extrabold tracking-wide">
+                  {lang === 'mr'
+                    ? (tenantConfig.brandTagline || t.nav.tagline)
+                    : (tenantConfig.brandTaglineEn || tenantConfig.brandTagline || t.nav.tagline)}
+                </p>
+              </div>
             </div>
           </a>
 
-          {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-7">
+          {/* Desktop Navigation Links (Floating Glass Pill Group) */}
+          <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1 bg-slate-100/80 p-1.5 rounded-2xl border border-slate-200/80 shadow-2xs backdrop-blur-xs">
             <a
               href="#home"
-              className="text-sm font-semibold text-slate-700 hover:text-emerald-700 transition"
+              className="px-3 xl:px-3.5 py-1.5 rounded-xl text-xs xl:text-sm font-bold text-slate-800 hover:text-emerald-700 hover:bg-white hover:shadow-xs transition-all duration-200"
             >
               {t.nav.home}
             </a>
             <a
               href="#services"
-              className="text-sm font-semibold text-slate-700 hover:text-emerald-700 transition"
+              className="px-3 xl:px-3.5 py-1.5 rounded-xl text-xs xl:text-sm font-bold text-slate-700 hover:text-emerald-700 hover:bg-white hover:shadow-xs transition-all duration-200"
             >
               {t.nav.services}
             </a>
             <a
               href="#how-it-works"
-              className="text-sm font-semibold text-slate-700 hover:text-emerald-700 transition"
+              className="px-3 xl:px-3.5 py-1.5 rounded-xl text-xs xl:text-sm font-bold text-slate-700 hover:text-emerald-700 hover:bg-white hover:shadow-xs transition-all duration-200"
             >
               {lang === 'mr' ? 'कार्यपद्धती' : t.howItWorks.title}
             </a>
             <a
               href="#faq"
-              className="text-sm font-semibold text-slate-700 hover:text-emerald-700 transition"
+              className="px-3 xl:px-3.5 py-1.5 rounded-xl text-xs xl:text-sm font-bold text-slate-700 hover:text-emerald-700 hover:bg-white hover:shadow-xs transition-all duration-200"
             >
               FAQ
             </a>
             <a
               href="#contact"
-              className="text-sm font-semibold text-slate-700 hover:text-emerald-700 transition"
+              className="px-3 xl:px-3.5 py-1.5 rounded-xl text-xs xl:text-sm font-bold text-slate-700 hover:text-emerald-700 hover:bg-white hover:shadow-xs transition-all duration-200"
             >
               {t.nav.contact}
             </a>
           </nav>
 
-          {/* Actions: Clear Segmented Language Toggle & CRM Portal CTA */}
-          <div className="hidden sm:flex items-center gap-2.5">
+          {/* Actions: Segmented Language Toggle, Citizen Portal, & CRM CTA */}
+          <div className="hidden sm:flex items-center gap-2.5 xl:gap-3 shrink-0">
             {/* Segmented Marathi | English Switcher */}
-            <div className="inline-flex items-center rounded-xl border border-slate-300 bg-slate-100 p-0.5 text-xs font-bold shadow-2xs">
+            <div className="inline-flex items-center rounded-xl border border-slate-200/90 bg-slate-100/90 p-1 text-xs font-bold shadow-2xs">
               <button
                 onClick={() => setLang('mr')}
                 type="button"
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition active:scale-95 cursor-pointer ${
+                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg transition-all active:scale-95 cursor-pointer ${
                   lang === 'mr'
                     ? 'bg-emerald-600 text-white shadow-xs font-black'
-                    : 'text-slate-700 hover:text-slate-950 font-semibold'
+                    : 'text-slate-600 hover:text-slate-900 font-semibold'
                 }`}
                 title="मराठी भाषा निवडा"
               >
@@ -412,10 +420,10 @@ export default function App() {
               <button
                 onClick={() => setLang('en')}
                 type="button"
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition active:scale-95 cursor-pointer ${
+                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg transition-all active:scale-95 cursor-pointer ${
                   lang === 'en'
                     ? 'bg-emerald-600 text-white shadow-xs font-black'
-                    : 'text-slate-700 hover:text-slate-950 font-semibold'
+                    : 'text-slate-600 hover:text-slate-900 font-semibold'
                 }`}
                 title="Switch to English"
               >
@@ -429,10 +437,10 @@ export default function App() {
               <button
                 onClick={() => setDashboardModalOpen(true)}
                 type="button"
-                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-950 font-bold text-xs shadow-2xs transition active:scale-95 cursor-pointer"
+                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 hover:from-emerald-100 hover:to-teal-100 border border-emerald-300 text-emerald-950 font-bold text-xs sm:text-sm shadow-xs transition-all active:scale-95 cursor-pointer"
                 title="नागरिक प्रोफाइल व अर्ज ट्रॅकिंग"
               >
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 <User className="w-4 h-4 text-emerald-700" />
                 <span className="truncate max-w-[110px]">{currentCitizen.fullName}</span>
               </button>
@@ -440,10 +448,12 @@ export default function App() {
               <button
                 onClick={() => setAuthModalOpen(true)}
                 type="button"
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-800 font-bold text-xs shadow-2xs transition active:scale-95 cursor-pointer"
+                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white hover:bg-emerald-50/50 border border-slate-300 hover:border-emerald-500 text-slate-800 hover:text-emerald-900 font-bold text-xs sm:text-sm shadow-xs hover:shadow-sm transition-all active:scale-95 cursor-pointer group"
                 title="नागरिक लॉगिन किंवा नवीन नोंदणी"
               >
-                <LogIn className="w-4 h-4 text-slate-600" />
+                <div className="w-6 h-6 rounded-lg bg-emerald-100/70 group-hover:bg-emerald-200/80 flex items-center justify-center transition-colors">
+                  <LogIn className="w-3.5 h-3.5 text-emerald-800" />
+                </div>
                 <span>{lang === 'mr' ? 'नागरिक लॉगिन' : 'Citizen Login'}</span>
               </button>
             )}
@@ -453,10 +463,15 @@ export default function App() {
               href={tenantConfig.crmUrl || 'https://crm.agmultiservices.online'}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-semibold text-xs sm:text-sm shadow-md shadow-emerald-600/25 transition active:scale-95 group"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-800 hover:from-emerald-500 hover:to-teal-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-emerald-700/25 hover:shadow-lg hover:shadow-emerald-700/35 transition-all active:scale-95 border border-emerald-400/40 group"
+              title="VLE ऑपरेटर व केंद्र CRM पोर्टल"
             >
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-200 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+              </span>
               <span>{t.nav.openCrm}</span>
-              <ExternalLink className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              <ExternalLink className="w-3.5 h-3.5 text-emerald-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
             </a>
           </div>
 
@@ -485,6 +500,9 @@ export default function App() {
             </button>
           </div>
         </div>
+
+        {/* Subtle Signature Government & Digital Portal Accent Stripe */}
+        <div className="h-[2px] bg-gradient-to-r from-amber-500 via-emerald-500 to-teal-600 opacity-80"></div>
 
         {/* Mobile Dropdown Menu */}
         {mobileMenuOpen && (
