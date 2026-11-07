@@ -121,13 +121,21 @@ export default function App() {
     }
   };
 
-  // Sync on initial mount & load published tenant config (Live CRM + local fallback)
+  // Sync on initial mount & load published tenant config (Live CRM + Cloud Storage + local fallback)
   useEffect(() => {
     const crmApiUrl = `https://crm.agmultiservices.online/api/portal/config?accountId=${tenantConfig.accountId}`;
+    const storageApiUrl = `https://kpvjenicwrzuzrxvucmf.supabase.co/storage/v1/object/public/portal-config/tenant-config.json?t=${Date.now()}`;
+
     fetch(crmApiUrl)
       .then((res) => {
         if (res.ok) return res.json();
         throw new Error('CRM config API unavailable');
+      })
+      .catch(() => {
+        return fetch(storageApiUrl).then((res) => {
+          if (res.ok) return res.json();
+          throw new Error('Storage config unavailable');
+        });
       })
       .catch(() => {
         return fetch('/tenant.config.json?t=' + Date.now()).then((res) => {
@@ -169,7 +177,11 @@ export default function App() {
 
   // Sync on initial mount & language change
   useEffect(() => {
-    setAnnouncement(content[lang].announcement);
+    // Preserve dynamic live announcement if loaded, only fallback if empty
+    setAnnouncement((prev) => {
+      if (prev?.text) return prev;
+      return content[lang].announcement;
+    });
     setContactInfo(content[lang].contact);
     setFaqs(content[lang].faq.items);
 
@@ -294,7 +306,9 @@ export default function App() {
               {lang === 'mr' ? 'महत्त्वाची सूचना' : 'Notice'}
             </span>
             <p className="font-semibold truncate text-emerald-100 text-xs sm:text-sm">
-              {announcement.text || (lang === 'mr' ? 'लाडकी बहीण योजना ई-केवायसी आणि नवीन अर्ज केंद्रामध्ये सुरू आहेत.' : 'Majhi Ladki Bahin Yojana e-KYC & applications are active.')}
+              {(lang === 'en' && announcement.textEn)
+                ? announcement.textEn
+                : (announcement.text || (lang === 'mr' ? 'महा आयडी कार्ड नवीन अर्ज केंद्रामध्ये सुरू आहेत.' : 'Maha ID Card new applications are active at our center.'))}
             </p>
             <a
               href="#services"

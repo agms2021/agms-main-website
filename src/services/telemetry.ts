@@ -111,3 +111,4 @@ export function initWebsiteTelemetry() {
 
   console.log('[Telemetry] AGMS Website Telemetry Active');
 }
+

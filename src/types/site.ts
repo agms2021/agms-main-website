@@ -28,6 +28,7 @@ export interface FaqItem {
 export interface AnnouncementConfig {
   enabled: boolean;
   text: string;
+  textEn?: string;
   linkText?: string;
 }
 
