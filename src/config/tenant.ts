@@ -68,6 +68,23 @@ export function getInitialTenantConfig(): TenantConfig {
       }
     }
 
+    // Sanitize legacy or stale cached values
+    if (!base.brandTagline || base.brandTagline === 'शासकीय व नागरी सेवा केंद्र') {
+      base.brandTagline = 'तुमचा विश्वासू डिजिटल पार्टनर';
+    }
+    if (!base.brandTaglineEn || base.brandTaglineEn === 'Citizen & Government Services Center') {
+      base.brandTaglineEn = 'Your Trusted Digital Partner';
+    }
+    if (!base.centerBadge || base.centerBadge === 'अधिकृत केंद्र') {
+      base.centerBadge = 'आपले सरकार सेवा केंद्र';
+    }
+    if (!base.centerBadgeEn) {
+      base.centerBadgeEn = 'Aaple Sarkar Seva Kendra';
+    }
+    if (!base.timings || base.timings.includes('रात्री ५') || base.timings.includes('रात्री ८')) {
+      base.timings = 'सकाळी १०:०० ते सायंकाळी ५:३० (सोमवार ते शनिवार)';
+    }
+
     // Apply URL overrides if present
     if (urlAccountId) base.accountId = urlAccountId;
     if (urlBrand) {

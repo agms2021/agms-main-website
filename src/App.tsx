@@ -141,13 +141,24 @@ export default function App() {
           const officialTaglineEn = 'Your Trusted Digital Partner';
           const officialBadge = 'आपले सरकार सेवा केंद्र';
 
-          setTenantConfig((prev) => ({
-            ...prev,
-            ...data,
-            brandTagline: data.brandTagline === 'शासकीय व नागरी सेवा केंद्र' ? officialTagline : (data.brandTagline || officialTagline),
-            brandTaglineEn: data.brandTaglineEn === 'Citizen & Government Services Center' ? officialTaglineEn : (data.brandTaglineEn || officialTaglineEn),
-            centerBadge: data.centerBadge || officialBadge,
-          }));
+          setTenantConfig((prev) => {
+            const updated = {
+              ...prev,
+              ...data,
+              brandTagline: (!data.brandTagline || data.brandTagline === 'शासकीय व नागरी सेवा केंद्र') ? officialTagline : data.brandTagline,
+              brandTaglineEn: (!data.brandTaglineEn || data.brandTaglineEn === 'Citizen & Government Services Center') ? officialTaglineEn : data.brandTaglineEn,
+              centerBadge: data.centerBadge || officialBadge,
+              timings: (data.timings && (data.timings.includes('रात्री ५') || data.timings.includes('रात्री ८')))
+                ? 'सकाळी १०:०० ते सायंकाळी ५:३० (सोमवार ते शनिवार)'
+                : (data.timings || prev.timings),
+            };
+            try {
+              localStorage.setItem('agms_tenant_config', JSON.stringify(updated));
+            } catch {
+              // Ignore localstorage errors
+            }
+            return updated;
+          });
           if (data.announcement) {
             setAnnouncement(data.announcement);
           }
