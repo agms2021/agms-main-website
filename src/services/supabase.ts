@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { reportWebsiteError } from './telemetry';
 
 const SUPABASE_URL = 'https://kpvjenicwrzuzrxvucmf.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_4981M7nv9Kqd5DASiR4ikg_xOpbIiBL';
@@ -91,7 +92,7 @@ export async function registerCitizen(params: {
 
     // 2. Mirror into CRM 'contacts' table via secure CRM Portal API
     try {
-      await fetch('https://crm.agmultiservices.online/api/portal/citizen', {
+      const crmRes = await fetch('https://crm.agmultiservices.online/api/portal/citizen', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -109,8 +110,31 @@ export async function registerCitizen(params: {
           source: 'website',
         }),
       });
-    } catch (e) {
+
+      if (!crmRes.ok) {
+        const errorText = await crmRes.text().catch(() => 'Status ' + crmRes.status);
+        reportWebsiteError({
+          title: 'Citizen Registration Sync to CRM Failed',
+          detected_issue: `HTTP ${crmRes.status}: ${errorText.slice(0, 200)}`,
+          workflow: 'CitizenRegistrationSync',
+          severity: 'Critical',
+          username: phone,
+          safe_data: `Citizen: ${fullName} (${email})`,
+          unsaved_data: { fullName, phone, email, district, taluka, village },
+          recommended_action: 'Manually check CRM contacts table or retry syncing this citizen profile',
+        });
+      }
+    } catch (e: any) {
       console.warn('Could not mirror contact to CRM contacts table', e);
+      reportWebsiteError({
+        title: 'Network Error Mirroring Citizen to CRM',
+        detected_issue: e?.message || 'Network fetch failure',
+        workflow: 'CitizenRegistrationSync',
+        severity: 'Error',
+        username: phone,
+        safe_data: `Citizen: ${fullName} (${email})`,
+        failure_reason: e?.stack,
+      });
     }
 
     const citizen: CitizenUser = {
@@ -126,6 +150,15 @@ export async function registerCitizen(params: {
     return { user: citizen, error: null };
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error during registration';
+    reportWebsiteError({
+      title: 'Citizen Registration Exception',
+      detected_issue: message,
+      workflow: 'CitizenRegistration',
+      severity: 'Error',
+      username: params?.phone || '',
+      safe_data: `Citizen: ${params?.fullName || ''} (${params?.email || ''})`,
+      failure_reason: err instanceof Error ? err.stack : undefined,
+    });
     return { user: null, error: message };
   }
 }
