@@ -12,6 +12,13 @@ const getTelemetryUrl = () => {
   return 'https://crm.agmultiservices.online/api/telemetry/errors';
 };
 
+export interface Breadcrumb {
+  timestamp: string;
+  category: 'navigation' | 'click' | 'fetch' | 'console' | 'user_action';
+  message: string;
+  data?: Record<string, any>;
+}
+
 export interface TelemetryReportPayload {
   title: string;
   detected_issue: string;
@@ -23,6 +30,31 @@ export interface TelemetryReportPayload {
   unsaved_data?: any;
   attempted_fix?: string;
   recommended_action?: string;
+  release?: string;
+  breadcrumbs?: Breadcrumb[];
+}
+
+export const CURRENT_WEBSITE_RELEASE = 'website@0.9.0-prod';
+
+// Global circular in-memory breadcrumbs buffer (Sentry-style)
+const MAX_BREADCRUMBS = 15;
+const breadcrumbRing: Breadcrumb[] = [];
+
+export function recordBreadcrumb(category: Breadcrumb['category'], message: string, data?: Record<string, any>) {
+  const item: Breadcrumb = {
+    timestamp: new Date().toISOString(),
+    category,
+    message,
+    data,
+  };
+  breadcrumbRing.push(item);
+  if (breadcrumbRing.length > MAX_BREADCRUMBS) {
+    breadcrumbRing.shift();
+  }
+}
+
+export function getRecentBreadcrumbs(): Breadcrumb[] {
+  return [...breadcrumbRing];
 }
 
 // Simple in-memory cache to prevent duplicate flood within 10 seconds
@@ -35,6 +67,9 @@ export async function reportWebsiteError(payload: TelemetryReportPayload): Promi
     recentErrors.add(errorKey);
     setTimeout(() => recentErrors.delete(errorKey), 10000);
 
+    const attachedBreadcrumbs = payload.breadcrumbs || getRecentBreadcrumbs();
+    const release = payload.release || CURRENT_WEBSITE_RELEASE;
+
     const fullPayload = {
       source: 'Website',
       severity: payload.severity || 'Error',
@@ -45,7 +80,11 @@ export async function reportWebsiteError(payload: TelemetryReportPayload): Promi
       machine_id: typeof navigator !== 'undefined' ? `${navigator.userAgent.slice(0, 100)} (${window.innerWidth}x${window.innerHeight})` : 'Browser-Client',
       username: payload.username || '',
       safe_data: payload.safe_data || (typeof window !== 'undefined' ? window.location.href : ''),
-      unsaved_data: payload.unsaved_data || '',
+      unsaved_data: JSON.stringify({
+        release,
+        data: payload.unsaved_data || null,
+        breadcrumbs: attachedBreadcrumbs,
+      }),
       attempted_fix: payload.attempted_fix || '',
       recommended_action: payload.recommended_action || 'Check client inputs or network state',
     };
@@ -77,14 +116,34 @@ export async function reportWebsiteError(payload: TelemetryReportPayload): Promi
 }
 
 /**
- * Initializes global error listeners for the website.
+ * Initializes global error listeners and Sentry-style breadcrumbs for the website.
  * Call this once at app entry (e.g. App.tsx or main.tsx).
  */
 export function initWebsiteTelemetry() {
   if (typeof window === 'undefined') return;
 
-  // Window runtime error handler
+  // 1. Initial navigation breadcrumb
+  recordBreadcrumb('navigation', `Website loaded at ${window.location.pathname}${window.location.hash || ''}`);
+
+  // 2. Click tracking breadcrumb
+  window.addEventListener('click', (e) => {
+    try {
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+      const tag = target.tagName.toLowerCase();
+      const text = target.innerText?.trim()?.slice(0, 30) || target.getAttribute('aria-label') || '';
+      const id = target.id ? `#${target.id}` : '';
+      if (['button', 'a', 'input'].includes(tag) || target.closest('button, a')) {
+        recordBreadcrumb('click', `Clicked <${tag}${id}> "${text}"`);
+      }
+    } catch {
+      // Silent
+    }
+  }, { passive: true });
+
+  // 3. Window runtime error handler
   window.addEventListener('error', (event) => {
+    recordBreadcrumb('console', `Uncaught Error: ${event.message}`);
     reportWebsiteError({
       title: `Uncaught UI Error: ${event.message || 'Unknown Script Error'}`,
       detected_issue: event.message || 'Window error caught',
@@ -92,13 +151,15 @@ export function initWebsiteTelemetry() {
       severity: 'Error',
       failure_reason: event.error?.stack || `${event.filename}:${event.lineno}:${event.colno}`,
       safe_data: window.location.href,
+      breadcrumbs: getRecentBreadcrumbs(),
     });
   });
 
-  // Unhandled Promise Rejection (async API or network errors)
+  // 4. Unhandled Promise Rejection (async API or network errors)
   window.addEventListener('unhandledrejection', (event) => {
     const reason = event.reason;
     const msg = reason?.message || (typeof reason === 'string' ? reason : 'Promise rejected without error message');
+    recordBreadcrumb('console', `Unhandled Rejection: ${msg}`);
     reportWebsiteError({
       title: `Unhandled Async Rejection: ${msg.slice(0, 100)}`,
       detected_issue: msg,
@@ -106,9 +167,10 @@ export function initWebsiteTelemetry() {
       severity: 'Warning',
       failure_reason: reason?.stack || JSON.stringify(reason || {}),
       safe_data: window.location.href,
+      breadcrumbs: getRecentBreadcrumbs(),
     });
   });
 
-  console.log('[Telemetry] AGMS Website Telemetry Active');
+  console.log('[Telemetry] AGMS Main Website Telemetry Initialized with Sentry-style Breadcrumbs');
 }
 
