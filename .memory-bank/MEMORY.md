@@ -9,3 +9,4 @@
    - In case of uncaught exceptions or network errors, breadcrumbs and release version are transmitted silently to `https://crm.agmultiservices.online/api/telemetry/errors`.
 3. **Bhashini AI / Citizen Assistance**:
    - Aaple Sarkar services directory displays all services with direct WhatsApp inquiry links pre-filled with service title and customer phone number.
+

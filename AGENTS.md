@@ -29,3 +29,4 @@ After completing ANY task:
    - All citizen UI elements must support Marathi (`mr`) as primary language and English (`en`) as secondary.
 3. **Telemetry Integration**:
    - Runtime errors and unhandled promise rejections are automatically sent to CRM telemetry hub via `reportWebsiteError()` with Sentry-style breadcrumbs.
+
